@@ -13,6 +13,7 @@ class Server():
         self.listener.listen(1)
         print("Listening on port", port)
         self.clients_sockets= []
+        self.currentPlayer="0"
         signal.signal(signal.SIGINT, self.signal_handler)
         signal.signal(signal.SIGTERM, self.signal_handler)
         
@@ -43,6 +44,6 @@ class Server():
                 sock.sendall(data.encode("UTF-8"))
             except socket.error:
                 print("Cannot send the message")
-                
+                    
 server=Server(59001)
 server.run()

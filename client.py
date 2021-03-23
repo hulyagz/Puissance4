@@ -32,11 +32,17 @@ class Client():
 
     def send(self, message):
         try:
-            username_result = re.search('^USERNAME (.*)$', message)
-            print(username_result)
-            if not username_result:
-                message = "{0}: {1}".format(self.username, message)
-            self.socket.sendall(message.encode("UTF-8"))
+            #username_result = re.search('^USERNAME (.*)$', message)
+            #print(username_result)
+            #if not username_result:
+            #    message = "{0}: {1}".format(self.username, message)
+            #self.socket.sendall(message.encode("UTF-8"))
+            data = {
+                'username': self.username,
+                'message':message
+            }   
+            print(message)
+            self.socket.sendall(json.dumps(data).encode("UTF-8"))
         except socket.error:
             print("unable to send message")
 
@@ -52,8 +58,6 @@ class Client():
         else:
             print(data)
             self.handle(data)
-
-
 
     def receive_msg(self):
         print(self)

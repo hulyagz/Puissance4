@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import *
-
+import json
 from tkinter import Canvas, NW, Label, Button
 from client import Client
 from tkinter import scrolledtext
@@ -85,8 +85,16 @@ class PageMain(tk.Frame):
         self.messages.tag_config('message', foreground='#3498db')
 
         def send_message():
-            clientMessage = self.entryMessage.get()
-            self.client.send(clientMessage)
+            #clientMessage = self.entryMessage.get()
+            #self.client.send(clientMessage)
+            to_be_send = {
+                'type': 'message',
+                'data': {
+                    'message': self.entryMessage.get(),
+                },
+            }
+            
+            self.client.send(to_be_send)
 
         btnSendMessage = tk.Button(self, text="Send", width=20, command=send_message)
         btnSendMessage.grid(row=2, column=1, padx=10, pady=20)
@@ -97,6 +105,8 @@ class PageMain(tk.Frame):
 
     def handle(self, data):
         self.messages.insert(tk.END, data + '\n', 'message')
+        #data_parsed = json.loads(data)
+        #self.messages.insert(tk.END, data + '\n', data_parsed)
 
         self.joueur = 1
         self.monCanvas.create_rectangle(20, 400, 115, 425, fill=self.clair)
