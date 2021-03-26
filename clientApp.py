@@ -102,12 +102,32 @@ class PageMain(tk.Frame):
     def receive_data(self, data):
         self.client = Client(data['username'], data['server'], data['port'])
         self.client.listen(self.handle)
+        self.username = data['username']
 
     def handle(self, data):
-        self.messages.insert(tk.END, data + '\n', 'message')
+        #self.messages.insert(tk.END, data + '\n', 'message')
         #data_parsed = json.loads(data)
-        #self.messages.insert(tk.END, data + '\n', data_parsed)
-
+        #msg_parsed = data_parsed['message']['data']['message']
+        #self.messages.insert(tk.END, data + '\n', msg_parsed)
+        message_parsed = json.loads(data)
+        print(message_parsed)
+        if message_parsed['username'] == self.username:
+            username = "Vous"
+            message_type = "you"
+        else:
+            username = message_parsed['username']
+            message_type = "message"
+        if 'type' in message_parsed['message']:
+            if message_parsed['message']['type']:
+                if message_parsed['username'] == self.username:
+                    message = "{} < {}".format(
+                        message_parsed['message']['data']['message'], username)
+                else:
+                    message = "{} > {}".format(
+                        username, message_parsed['message']['data']['message'])
+                self.messages.insert(tk.END, message + '\n', message_type)
+        #if message_parsed['message']['type'] == "game": faire pareil pour les click
+            
         self.joueur = 1
         self.monCanvas.create_rectangle(20, 400, 115, 425, fill=self.clair)
         self.monCanvas.create_text(35, 405, text="Joueur :", anchor=NW, fill=self.fonce, font=self.police2)
