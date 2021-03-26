@@ -160,6 +160,14 @@ class PageMain(tk.Frame):
                     if event.x > (w, x, y, z)[0] and event.y > (w, x, y, z)[1] and event.x < (w, x, y, z)[
                         2] and event.y < (w, x, y, z)[3]:
                         self.colorier(self.dictionnaire[(w, x, y, z)])  # => Jouer
+                        data = {
+                            'type': 'game',
+                            'data': {
+                                'eventX': event.x,
+                                'eventY': event.y,
+                            },
+                        }
+                        self.client.send(data)
 
     def colorier(self, n, nb=0):  # G�re la coloration des cases
 
