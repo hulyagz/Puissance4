@@ -74,6 +74,9 @@ class PageMain(tk.Frame):
         self.running = 1  # Type de partie en cours
         self.couleur = ["Rouges", "Jaunes"]
         self.color = ["red", "#EDEF3A"]
+        self.started = False
+        self.his_ready = False
+        self.my_turn = False
         self.monCanvas = Canvas(self, width=446, height=430, bg=self.fonce, bd=0)
         self.monCanvas.grid(row=0, column=0)
         self.messages = scrolledtext.ScrolledText(self, width=50)
@@ -117,8 +120,9 @@ class PageMain(tk.Frame):
         else:
             username = message_parsed['username']
             message_type = "message"
+
         if 'type' in message_parsed['message']:
-            if message_parsed['message']['type']:
+            if message_parsed['message']['type'] == 'message':
                 if message_parsed['username'] == self.username:
                     message = "{} < {}".format(
                         message_parsed['message']['data']['message'], username)
@@ -126,8 +130,33 @@ class PageMain(tk.Frame):
                     message = "{} > {}".format(
                         username, message_parsed['message']['data']['message'])
                 self.messages.insert(tk.END, message + '\n', message_type)
-        #if message_parsed['message']['type'] == "game": faire pareil pour les click
-            
+            #else:
+             #   if message_parsed['username'] != self.username and self.started == False:
+              #      message_parsed['message']['player'] = 0
+               #     self.started = True
+                #    print("IL COMMENCE")
+                #else:
+                #    message_parsed['message']['player'] = 1
+            elif message_parsed['message']['type'] == "join":
+                join_player = {
+                    'type': 'join',
+                    'data': {
+                        'player': self.client.player,
+                    },
+                }
+                if message_parsed['message']['data']['player'] > self.client.player and message_parsed[
+                    'username'] != self.username and self.started == False:
+                    self.started = True
+                    #print("IL COMMENCE")
+                    self.messages.insert(tk.END, "IL COMMENCE")
+                    self.client.send(join_player)
+                elif message_parsed['username'] != self.username and self.started == False:
+                    self.started = True
+                    self.my_turn = True
+                    #print("TU COMMENCE")
+                    self.messages.insert(tk.END, "TU COMMENCE")
+                    self.client.send(join_player)
+
         self.joueur = 1
         self.monCanvas.create_rectangle(20, 400, 115, 425, fill=self.clair)
         self.monCanvas.create_text(35, 405, text="Joueur :", anchor=NW, fill=self.fonce, font=self.police2)
@@ -182,11 +211,13 @@ class PageMain(tk.Frame):
                         self.colorier(self.dictionnaire[(w, x, y, z)])  # => Jouer
                         data = {
                             'type': 'game',
+                            'player': self.client.player,
                             'data': {
                                 'eventX': event.x,
                                 'eventY': event.y,
                             },
                         }
+                        print(data)
                         self.client.send(data)
 
     def colorier(self, n, nb=0):  # G�re la coloration des cases

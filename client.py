@@ -4,6 +4,7 @@ from socket import *
 import socket
 import time
 import re
+from random import randint
 
 class Client():
 
@@ -11,7 +12,15 @@ class Client():
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((server, port))
         self.username = username
-        self.send("USERNAME {0}".format(username))
+        #self.send("USERNAME {0}".format(username))
+        self.player = randint(0, 1000)
+        join_player = {
+            'type': 'join',
+            'data': {
+                'player': self.player,
+            },
+        }
+        self.send(join_player)
         self.listening = True
         self.listen_thread = threading.Thread(target=self.listener)
 
