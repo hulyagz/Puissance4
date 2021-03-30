@@ -72,7 +72,6 @@ class PageMain(tk.Frame):
         self.listejaune = []  # Liste des cases jaunes
         self.dgagnantes = []  # Cases d�j� gagnantes et donc ne peuvent plus l"�tre � nouveau (cf "Continuer")
         self.running = 1  # Type de partie en cours
-        self.couleur = ["Rouges", "Jaunes"]
         self.color = ["red", "#EDEF3A"]
         self.started = False
         self.his_ready = False
@@ -122,8 +121,6 @@ class PageMain(tk.Frame):
                 self.coordscentres.append((x + 25, y + 25))
 
         def send_message():
-            #clientMessage = self.entryMessage.get()
-            #self.client.send(clientMessage)
             to_be_send = {
                 'type': 'message',
                 'data': {
@@ -170,8 +167,7 @@ class PageMain(tk.Frame):
                 if self.message_parsed['message']['data']['player'] > self.client.player and self.message_parsed[
                     'username'] != self.username and self.started == False:
                     self.started = True
-                    self.joueur = 0 #rouge
-                    #print("IL COMMENCE")
+                    self.joueur = 0 
                     self.indiccoul = self.monCanvas.create_oval(85, 405, 100, 420, fill=self.color[0])
                     self.messages.insert(tk.END, "IL COMMENCE")
                     self.client.send(join_player)
@@ -179,10 +175,9 @@ class PageMain(tk.Frame):
                 elif self.message_parsed['message']['data']['player'] < self.client.player and self.message_parsed['username'] != self.username and self.started == False:
                     self.started = True
                     self.my_turn = True
-                    self.joueur = 1 #jaune
+                    self.joueur = 1 
                     self.indiccoul = self.monCanvas.create_oval(85, 405, 100, 420, fill=self.color[1])
-                    #print("TU COMMENCE")
-                    self.messages.insert(tk.END, "TU COMMENCE")
+                    self.messages.insert(tk.END, "TU COMMENCES")
                     self.client.send(join_player)
             else:
                 eventX = self.message_parsed['message']['data']['eventX']
@@ -199,10 +194,6 @@ class PageMain(tk.Frame):
         # Jeu en cours: reconnaissance de la case jou�e
         else:
             if self.running != 0:
-                #for (w, x, y, z) in self.dictionnaire:
-                #    if event.x > (w, x, y, z)[0] and event.y > (w, x, y, z)[1] and event.x < (w, x, y, z)[
-                #        2] and event.y < (w, x, y, z)[3]:
-                #        self.colorier(self.dictionnaire[(w, x, y, z)])  # => Jouer
                         data = {
                             'type': 'game',
                             'player': self.client.player,
@@ -224,10 +215,8 @@ class PageMain(tk.Frame):
             self.colorier(n + 7)
 
         else:
-            # Sinon on colorie celle-ci
-            #self.monCanvas.itemconfigure(self.ovals[n], fill=self.color[0])
             self.designationCol = self.message_parsed['message']['color']
-            if self.message_parsed['message']['player'] > self.client.player: 
+            if  self.designationCol == 1: 
                 self.monCanvas.itemconfigure(self.ovals[n], fill=self.color[self.designationCol])
                 print(self.designationCol)
                 self.color[1] == self.listejaune.append(n)
@@ -238,12 +227,6 @@ class PageMain(tk.Frame):
                 print('liste rouge')
                 self.color[0] == self.listerouge.append(n)
                 print(self.listerouge)
-            #self.listejaune = [case for case in self.listejaune if case not in self.listerouge]
-            #self.color[0] == 'red' and self.listerouge.append(n)
-            
-            
-            
-            
             self.cases.append(n)
             self.verif(n)
 
@@ -308,7 +291,6 @@ class PageMain(tk.Frame):
                             return
 
         for x in (-1, 6, -8):
-
             if n in self.listejaune:
                 if n % 7 != 0 and (n + x) in self.listejaune:
                     if n % 7 != 1 and n + (2 * x) in self.listejaune:
