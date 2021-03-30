@@ -33,8 +33,10 @@ class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        tk.Label(self, text="Messagerie config:", fg="blue").grid(row=0, column=0)
-        tk.Label(self, text="username:").grid(row=1, column=0, padx=10, pady=10)
+        tk.Label(self, text="Messagerie config:",
+                 fg="blue").grid(row=0, column=0)
+        tk.Label(self, text="username:").grid(
+            row=1, column=0, padx=10, pady=10)
         tk.Label(self, text="server:").grid(row=2, column=0, padx=10, pady=10)
         tk.Label(self, text="port:").grid(row=3, column=0, padx=10, pady=10)
 
@@ -70,14 +72,16 @@ class PageMain(tk.Frame):
         self.cases = []  # Cases d�j� remplies
         self.listerouge = []  # Liste des cases rouges
         self.listejaune = []  # Liste des cases jaunes
-        self.dgagnantes = []  # Cases d�j� gagnantes et donc ne peuvent plus l"�tre � nouveau (cf "Continuer")
+        # Cases d�j� gagnantes et donc ne peuvent plus l"�tre � nouveau (cf "Continuer")
+        self.dgagnantes = []
         self.running = 1  # Type de partie en cours
         self.couleur = ["Rouges", "Jaunes"]
         self.color = ["red", "#EDEF3A"]
         self.started = False
         self.his_ready = False
         self.my_turn = False
-        self.monCanvas = Canvas(self, width=446, height=430, bg=self.fonce, bd=0)
+        self.monCanvas = Canvas(
+            self, width=446, height=430, bg=self.fonce, bd=0)
         self.monCanvas.grid(row=0, column=0)
         self.messages = scrolledtext.ScrolledText(self, width=50)
         self.messages.grid(row=0, column=1, padx=10, pady=10)
@@ -86,93 +90,21 @@ class PageMain(tk.Frame):
         self.entryMessage.insert(0, "Votre message")
         self.entryMessage.grid(row=1, column=1, padx=10, pady=10)
         self.messages.tag_config('message', foreground='#3498db')
-
-        def send_message():
-            #clientMessage = self.entryMessage.get()
-            #self.client.send(clientMessage)
-            to_be_send = {
-                'type': 'message',
-                'data': {
-                    'message': self.entryMessage.get(),
-                },
-            }
-            
-            self.client.send(to_be_send)
-
-        btnSendMessage = tk.Button(self, text="Send", width=20, command=send_message)
-        btnSendMessage.grid(row=2, column=1, padx=10, pady=20)
-
-    def receive_data(self, data):
-        self.client = Client(data['username'], data['server'], data['port'])
-        self.client.listen(self.handle)
-        self.username = data['username']
-
-    def handle(self, data):
-        #self.messages.insert(tk.END, data + '\n', 'message')
-        #data_parsed = json.loads(data)
-        #msg_parsed = data_parsed['message']['data']['message']
-        #self.messages.insert(tk.END, data + '\n', msg_parsed)
-        message_parsed = json.loads(data)
-        print(message_parsed)
-        if message_parsed['username'] == self.username:
-            username = "Vous"
-            message_type = "you"
-        else:
-            username = message_parsed['username']
-            message_type = "message"
-
-        if 'type' in message_parsed['message']:
-            if message_parsed['message']['type'] == 'message':
-                if message_parsed['username'] == self.username:
-                    message = "{} < {}".format(
-                        message_parsed['message']['data']['message'], username)
-                else:
-                    message = "{} > {}".format(
-                        username, message_parsed['message']['data']['message'])
-                self.messages.insert(tk.END, message + '\n', message_type)
-            #else:
-             #   if message_parsed['username'] != self.username and self.started == False:
-              #      message_parsed['message']['player'] = 0
-               #     self.started = True
-                #    print("IL COMMENCE")
-                #else:
-                #    message_parsed['message']['player'] = 1
-            elif message_parsed['message']['type'] == "join":
-                join_player = {
-                    'type': 'join',
-                    'data': {
-                        'player': self.client.player,
-                    },
-                }
-                if message_parsed['message']['data']['player'] > self.client.player and message_parsed[
-                    'username'] != self.username and self.started == False:
-                    self.started = True
-                    #print("IL COMMENCE")
-                    self.messages.insert(tk.END, "IL COMMENCE")
-                    self.client.send(join_player)
-                elif message_parsed['username'] != self.username and self.started == False:
-                    self.started = True
-                    self.my_turn = True
-                    #print("TU COMMENCE")
-                    self.messages.insert(tk.END, "TU COMMENCE")
-                    self.client.send(join_player)
-
-        self.joueur = 1
-        self.monCanvas.create_rectangle(20, 400, 115, 425, fill=self.clair)
-        self.monCanvas.create_text(35, 405, text="Joueur :", anchor=NW, fill=self.fonce, font=self.police2)
-        self.indiccoul = self.monCanvas.create_oval(85, 405, 100, 420, fill=self.color[1])
-
-        # Bouton Nouveau Jeu
-
+        # nouveau jeu
         self.monCanvas.create_rectangle(330, 400, 420, 425, fill=self.clair)
-        self.monCanvas.create_text(340, 405, text="Nouveau jeu", anchor=NW, fill=self.fonce, font=self.police2)
+        self.monCanvas.create_text(
+            340, 405, text="Nouveau jeu", anchor=NW, fill=self.fonce, font=self.police2)
+        self.monCanvas.create_rectangle(20, 400, 115, 425, fill=self.clair)
+        self.monCanvas.create_text(
+            35, 405, text="Joueur :", anchor=NW, fill=self.fonce, font=self.police2)
 
         # Cr�ation des cases
 
         self.ovals = []
         for y in range(10, 390, 55):
             for x in range(10, 437, 63):
-                self.ovals.append(self.monCanvas.create_oval(x, y, x + 50, y + 50, fill="white"))
+                self.ovals.append(self.monCanvas.create_oval(
+                    x, y, x + 50, y + 50, fill="white"))
 
             # En cas de click
 
@@ -196,22 +128,96 @@ class PageMain(tk.Frame):
                 v += 1
                 self.coordscentres.append((x + 25, y + 25))
 
+        def send_message():
+            #clientMessage = self.entryMessage.get()
+            # self.client.send(clientMessage)
+            to_be_send = {
+                'type': 'message',
+                'data': {
+                    'message': self.entryMessage.get(),
+                },
+            }
+
+            self.client.send(to_be_send)
+
+        btnSendMessage = tk.Button(
+            self, text="Send", width=20, command=send_message)
+        btnSendMessage.grid(row=2, column=1, padx=10, pady=20)
+
+    def receive_data(self, data):
+        self.client = Client(data['username'], data['server'], data['port'])
+        self.client.listen(self.handle)
+        self.username = data['username']
+
+    def handle(self, data):
+        message_parsed = json.loads(data)
+        print(message_parsed)
+        if message_parsed['username'] == self.username:
+            username = "Vous"
+            message_type = "you"
+        else:
+            username = message_parsed['username']
+            message_type = "message"
+        if 'type' in message_parsed['message']:
+            if message_parsed['message']['type'] == 'message':
+                if message_parsed['username'] == self.username:
+                    message = "{} < {}".format(
+                        message_parsed['message']['data']['message'], username)
+                else:
+                    message = "{} > {}".format(
+                        username, message_parsed['message']['data']['message'])
+                self.messages.insert(tk.END, message + '\n', message_type)
+            elif message_parsed['message']['type'] == "join":
+                join_player = {
+                    'type': 'join',
+                    'data': {
+                        'player': self.client.player,
+                    },
+                }
+                if message_parsed['message']['data']['player'] > self.client.player and message_parsed[
+                        'username'] != self.username and self.started == False:
+                    self.started = True
+                    self.joueur = 0  # rouge
+                    #print("IL COMMENCE")
+                    self.indiccoul = self.monCanvas.create_oval(
+                        85, 405, 100, 420, fill=self.color[0])
+                    self.messages.insert(tk.END, "IL COMMENCE")
+                    self.client.send(join_player)
+                    self.joueur = [0, 1][[0, 1].index(self.joueur)]
+                elif message_parsed['message']['data']['player'] < self.client.player and message_parsed['username'] != self.username and self.started == False:
+                    self.started = True
+                    self.my_turn = True
+                    self.joueur = 1  # jaune
+                    self.indiccoul = self.monCanvas.create_oval(
+                        85, 405, 100, 420, fill=self.color[1])
+                    #print("TU COMMENCE")
+                    self.messages.insert(tk.END, "TU COMMENCE")
+                    self.client.send(join_player)
+            else:
+                eventX = message_parsed['message']['data']['eventX']
+                eventY = message_parsed['message']['data']['eventY']
+                color = message_parsed['message']['color']
+                for (w, x, y, z) in self.dictionnaire:
+                    if eventX > (w, x, y, z)[0] and eventY > (w, x, y, z)[1] and eventX < (w, x, y, z)[
+                            2] and eventY < (w, x, y, z)[3]:
+                        self.colorier(self.dictionnaire[(w, x, y, z)], color)
+
     def click(self, event):  # En cas de click
         print(event)
         if 330 < event.x and 400 < event.y and event.x < 420 and event.y < 425:
             self.new()  # =>Nouveau jeu
-
-            # Jeu en cours: reconnaissance de la case jou�e
-
+        # Jeu en cours: reconnaissance de la case jou�e
         else:
             if self.running != 0:
                 for (w, x, y, z) in self.dictionnaire:
                     if event.x > (w, x, y, z)[0] and event.y > (w, x, y, z)[1] and event.x < (w, x, y, z)[
-                        2] and event.y < (w, x, y, z)[3]:
-                        self.colorier(self.dictionnaire[(w, x, y, z)])  # => Jouer
+                            2] and event.y < (w, x, y, z)[3]:
+                        self.colorier(
+                            self.dictionnaire[(w, x, y, z)])  # => Jouer
                         data = {
                             'type': 'game',
                             'player': self.client.player,
+                            'color': self.joueur,
                             'data': {
                                 'eventX': event.x,
                                 'eventY': event.y,
@@ -220,68 +226,89 @@ class PageMain(tk.Frame):
                         print(data)
                         self.client.send(data)
 
-    def colorier(self, n, nb=0):  # G�re la coloration des cases
+    def colorier(self, n, color=1, nb=0):  # G�re la coloration des cases
 
-        if n in self.cases: return  # Une case colori�e ne peut plus changer de couleur
+        if n in self.cases:
+            return  # Une case colori�e ne peut plus changer de couleur
 
-        if n + 7 not in self.cases and n + 7 < 49:  # Si la case en dessous est vide et existe, on essaie d'abord de colorier celle-l�
+        # Si la case en dessous est vide et existe, on essaie d'abord de colorier celle-l�
+        if n + 7 not in self.cases and n + 7 < 49:
             self.colorier(n + 7)
 
         else:
 
             # Sinon on colorie celle-ci
-
-            self.monCanvas.itemconfigure(self.ovals[n], fill=self.color[self.joueur])
-            self.cases.append(n)
-            self.color[self.joueur] == 'red' and self.listerouge.append(n) or self.listejaune.append(n)
-            self.listejaune = [case for case in self.listejaune if case not in self.listerouge]
-            self.verif(n)
+            ##self.monCanvas.itemconfigure(self.ovals[n], fill=self.color[self.joueur])
+            # self.cases.append(n)
+            #self.color[0] == 'red' and self.listerouge.append(n)
+            #self.listejaune = [case for case in self.listejaune if case not in self.listerouge]
+            # self.verif(n)
 
             # Changement de joueur
 
-            self.joueur = [0, 1][[0, 1].index(self.joueur) - 1]
-            self.monCanvas.itemconfigure(self.indiccoul, fill=self.color[self.joueur])
-
-            # On regarde toutes les cases sont remplies
-
+            #self.joueur = [0, 1][[0, 1].index(self.joueur) - 1]
+            if self.joueur == 1:  # jaune tucomm
+                self.monCanvas.itemconfigure(self.ovals[n], fill=color)
+                # self.cases.append(n)
+                # self.color[1] == '#EDEF3A' and self.listejaune.append(n)
+                #self.joueur = [0, 1][[0, 1].index(self.joueur) - 1]
+                #self.monCanvas.itemconfigure(self.indiccoul, fill=self.color[1])
+                # self.verif(n)
+            else:
+                print('toto')
+                #self.monCanvas.itemconfigure(self.ovals[n], fill=color[0])
+                # self.cases.append(n)
+                #self.listejaune = [case for case in self.listejaune if case not in self.listerouge]
+                #self.color[0] == 'red' and self.listerouge.append(n)
+                #self.monCanvas.itemconfigure(self.indiccoul, fill=self.color[0])
+                # self.verif(n)
+                # On regarde toutes les cases sont remplies
             self.verificationFinale()
 
         return
 
     def verif(self, n):  # V�rifie si la pi�ce ajout�e s'aligne avec trois autres d�j� plac�es
 
-        if self.running == 0: return
+        if self.running == 0:
+            return
 
         if n in self.listerouge and n + 7 in self.listerouge and n + 14 in self.listerouge and n + 21 in self.listerouge:  # D'abbord � la verticale,
             # s�par�ment car proximit� d'un bord inint�ressante
-            liste = [n, n + 7, n + 14, n + 21]  # Pour g�r�r les parties "plurigagnantes"
-            if self.gagnantes(liste): self.win("rouges", liste[0], liste[3])
+            # Pour g�r�r les parties "plurigagnantes"
+            liste = [n, n + 7, n + 14, n + 21]
+            if self.gagnantes(liste):
+                self.win("rouges", liste[0], liste[3])
             return
 
             # idem pour jaunes
 
         if n in self.listejaune and n + 7 in self.listejaune and n + 14 in self.listejaune and n + 21 in self.listejaune:
             liste = [n, n + 7, n + 14, n + 21]
-            if self.gagnantes(liste): self.win("jaunes", liste[0], liste[3])
+            if self.gagnantes(liste):
+                self.win("jaunes", liste[0], liste[3])
             return
 
         for x in (1, -6, 8):
 
-            if n in self.listerouge:  # en s'assurant qu'elles ne sont trop pr�s des bords (pour ne pas arriver de l'autre cot� du plateau)
+            # en s'assurant qu'elles ne sont trop pr�s des bords (pour ne pas arriver de l'autre cot� du plateau)
+            if n in self.listerouge:
                 if n % 7 != 6 and n + x in self.listerouge:
                     if n % 7 != 5 and n + 2 * x in self.listerouge:
                         if n % 7 != 4 and n + 3 * x in self.listerouge:
                             liste = [n, n + x, n + 2 * x, n + 3 * x]
-                            if self.gagnantes(liste): self.win("rouges", liste[0], liste[3])
+                            if self.gagnantes(liste):
+                                self.win("rouges", liste[0], liste[3])
                             return
                         if n % 7 > 0 and (n - x) in self.listerouge:
                             liste = [n - x, n, n + x, n + 2 * x]
-                            if self.gagnantes(liste): self.win("rouges", liste[0], liste[3])
+                            if self.gagnantes(liste):
+                                self.win("rouges", liste[0], liste[3])
                             return
                     if n % 7 > 1 and (n - x) in self.listerouge:
                         if n % 7 > 2 and n - (2 * x) in self.listerouge:
                             liste = [n - 2 * x, n - x, n, n + x]
-                            if self.gagnantes(liste): self.win("rouges", liste[0], liste[3])
+                            if self.gagnantes(liste):
+                                self.win("rouges", liste[0], liste[3])
                             return
 
                 # Pareil pour les jaunes
@@ -291,16 +318,19 @@ class PageMain(tk.Frame):
                     if n % 7 != 5 and n + 2 * x in self.listejaune:
                         if n % 7 != 4 and n + 3 * x in self.listejaune:
                             liste = [n, n + x, n + 2 * x, n + 3 * x]
-                            if self.gagnantes(liste): self.win("jaunes", liste[0], liste[3])
+                            if self.gagnantes(liste):
+                                self.win("jaunes", liste[0], liste[3])
                             return
                         if n % 7 > 0 and (n - x) in self.listejaune:
                             liste = [n - x, n, n + x, n + 2 * x]
-                            if self.gagnantes(liste): self.win("jaunes", liste[0], liste[3])
+                            if self.gagnantes(liste):
+                                self.win("jaunes", liste[0], liste[3])
                             return
                     if n % 7 > 1 and (n - x) in self.listejaune:
                         if n % 7 > 2 and n - (2 * x) in self.listejaune:
                             liste = [n - 2 * x, n - x, n, n + x]
-                            if self.gagnantes(liste): self.win("jaunes", liste[0], liste[3])
+                            if self.gagnantes(liste):
+                                self.win("jaunes", liste[0], liste[3])
                             return
 
         for x in (-1, 6, -8):
@@ -310,16 +340,19 @@ class PageMain(tk.Frame):
                     if n % 7 != 1 and n + (2 * x) in self.listejaune:
                         if n % 7 != 2 and n + (3 * x) in self.listejaune:
                             liste = [n, n + x, n + 2 * x, n + 3 * x]
-                            if self.gagnantes(liste): self.win("jaunes", liste[0], liste[3])
+                            if self.gagnantes(liste):
+                                self.win("jaunes", liste[0], liste[3])
                             return
                         if n % 7 < 6 and (n - x) in self.listejaune:
                             liste = [n - x, n, n + x, n + 2 * x]
-                            if self.gagnantes(liste): self.win("jaunes", liste[0], liste[3])
+                            if self.gagnantes(liste):
+                                self.win("jaunes", liste[0], liste[3])
                             return
                     if n % 7 < 5 and (n - x) in self.listejaune:
                         if n % 7 < 4 and n - (2 * x) in self.listejaune:
                             liste = [n - 2 * x, n - x, n, n + x]
-                            if self.gagnantes(liste): self.win("jaunes", liste[0], liste[3])
+                            if self.gagnantes(liste):
+                                self.win("jaunes", liste[0], liste[3])
                             return
 
             if n in self.listerouge:
@@ -327,16 +360,19 @@ class PageMain(tk.Frame):
                     if n % 7 != 1 and n + (2 * x) in self.listerouge:
                         if n % 7 != 2 and n + (3 * x) in self.listerouge:
                             liste = [n, n + x, n + 2 * x, n + 3 * x]
-                            if self.gagnantes(liste): self.win("rouges", liste[0], liste[3])
+                            if self.gagnantes(liste):
+                                self.win("rouges", liste[0], liste[3])
                             return
                         if n % 7 < 6 and (n - x) in self.listerouge:
                             liste = [n - x, n, n + x, n + 2 * x]
-                            if self.gagnantes(liste): self.win("rouges", liste[0], liste[3])
+                            if self.gagnantes(liste):
+                                self.win("rouges", liste[0], liste[3])
                             return
                     if n % 7 < 5 and (n - x) in self.listerouge:
                         if n % 7 < 4 and n - (2 * x) in self.listerouge:
                             liste = [n - 2 * x, n - x, n, n + x]
-                            if self.gagnantes(liste): self.win("rouges", liste[0], liste[3])
+                            if self.gagnantes(liste):
+                                self.win("rouges", liste[0], liste[3])
                             return
 
     def verificationFinale(self):  # Lorsque toutes les cases sont remplies
@@ -352,7 +388,8 @@ class PageMain(tk.Frame):
                                     fg=self.clair, font=self.police1)
                 self.texte2.grid()
             else:
-                self.texte2 = Label(self, text=typ[0], bg=self.fonce, fg=self.clair, font=self.police1)
+                self.texte2 = Label(
+                    self, text=typ[0], bg=self.fonce, fg=self.clair, font=self.police1)
                 self.texte2.grid(padx=110)
 
     def win(self, qui, p, d):  # Partie gagn�e
@@ -360,11 +397,13 @@ class PageMain(tk.Frame):
         # Marquage des pi�ces gagnantes
 
         self.monCanvas.create_line(self.coordscentres[p][0], self.coordscentres[p][1],
-                         self.coordscentres[d][0], self.coordscentres[d][1],
-                         fill="blue")
+                                   self.coordscentres[d][0], self.coordscentres[d][1],
+                                   fill="blue")
 
-        if qui == "rouges": self.rouges += 1  # Comptabilisation des suites
-        if qui == "jaunes": self.jaunes += 1
+        if qui == "rouges":
+            self.rouges += 1  # Comptabilisation des suites
+        if qui == "jaunes":
+            self.jaunes += 1
 
         if self.running == 3:
             self.pRouges.config(text="Rouges : " + str(self.rouges))
@@ -374,7 +413,8 @@ class PageMain(tk.Frame):
             # Affichage des scores
 
         self.qui = qui
-        self.texte = Label(self, text="Les %s ont gagne !" % (qui), bg=self.fonce, fg=self.clair, font=self.police1)
+        self.texte = Label(self, text="Les %s ont gagne !" % (
+            qui), bg=self.fonce, fg=self.clair, font=self.police1)
         self.texte.grid()
         self.running = 0
 
@@ -404,7 +444,8 @@ class PageMain(tk.Frame):
                   liste=[]):  # On v�rifie que les pi�ces ne sont pas encore gagnantes, et on les ajoute dans la liste si elles le deviennent
 
         for i in liste:
-            if i in self.dgagnantes: return 0
+            if i in self.dgagnantes:
+                return 0
 
         for n in liste:
             self.dgagnantes.append(n)
@@ -413,9 +454,12 @@ class PageMain(tk.Frame):
 
     def plus(self):  # Donner le r�sultat final
 
-        if self.rouges > self.jaunes: return "Rouges", 0
-        if self.jaunes > self.rouges: return "Jaunes", 0
-        if self.rouges != 0: return self.qui, 1  # En cas d'�galit�, le premier � avoir align� ses pi�ces gagne
+        if self.rouges > self.jaunes:
+            return "Rouges", 0
+        if self.jaunes > self.rouges:
+            return "Jaunes", 0
+        if self.rouges != 0:
+            return self.qui, 1  # En cas d'�galit�, le premier � avoir align� ses pi�ces gagne
 
         return "Personne n'a gagn�", 2  # Sinon, tous deux ont perdu
 
@@ -445,7 +489,6 @@ class PageMain(tk.Frame):
             pass
 
             # Op�rations qui le sont
-
 
 
 if __name__ == '__main__':
